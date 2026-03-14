@@ -57,10 +57,116 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUsers = (req: Request, res: Response) => {};
-export const getUserById = (req: Request, res: Response) => {};
-export const updateUser = (req: Request, res: Response) => {};
-export const deleteUser = (req: Request, res: Response) => {};
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "User fetched successfully",
+      data: user,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const { email, password } = req.body;
+
+    const data: any = {};
+
+    if (email) data.email = email;
+    if (password) data.password = await hashPassword(password);
+
+    const user = await prisma.user.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: "User updated successfully",
+      data: user,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return res.json({
+      success: true,
+      message: "User deleted successfully",
+      data: null,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
@@ -123,4 +229,23 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserTasks = (req: Request, res: Response) => {};
+export const getUserTasks = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const tasks = await prisma.task.findMany({
+      where: { userId: id },
+    });
+
+    return res.json({
+      success: true,
+      message: "Tasks fetched successfully",
+      data: tasks,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
