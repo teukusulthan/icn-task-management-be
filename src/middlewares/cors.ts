@@ -1,8 +1,8 @@
 import cors from "cors";
 
-const origins = process.env.CLIENT_URL?.split(",") || [];
+const clientUrl = process.env.CLIENT_URL;
 
 export const corsMiddleware = cors({
-  origin: origins,
+  origin: clientUrl,
   credentials: true,
 });
