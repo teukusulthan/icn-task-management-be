@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { prisma } from "../connections/client";
-import { hashPassword } from "../utils/password";
-import { createUserSchema } from "../validators/user.validator";
+import { hashPassword, comparePassword } from "../utils/password";
+import { createUserSchema, loginSchema } from "../validators/user.validator";
+import { generateToken } from "../utils/jwt";
+import { ZodError } from "zod";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -13,6 +15,7 @@ export const createUser = async (req: Request, res: Response) => {
 
     if (existingUser) {
       return res.status(400).json({
+        success: false,
         message: "Email already registered",
       });
     }
@@ -31,11 +34,25 @@ export const createUser = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(201).json(user);
+    return res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      data: user,
+    });
   } catch (error) {
-    return res.status(400).json({
-      message: "Invalid request",
-      error,
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.issues,
+      });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -44,5 +61,66 @@ export const getUsers = (req: Request, res: Response) => {};
 export const getUserById = (req: Request, res: Response) => {};
 export const updateUser = (req: Request, res: Response) => {};
 export const deleteUser = (req: Request, res: Response) => {};
-export const loginUser = (req: Request, res: Response) => {};
+
+export const loginUser = async (req: Request, res: Response) => {
+  try {
+    const validatedData = loginSchema.parse(req.body);
+
+    const user = await prisma.user.findUnique({
+      where: { email: validatedData.email },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const isPasswordValid = await comparePassword(
+      validatedData.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const token = generateToken(user.id);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
+      success: true,
+      message: "Login successful",
+      data: {
+        userId: user.id,
+      },
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.issues,
+      });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export const getUserTasks = (req: Request, res: Response) => {};
