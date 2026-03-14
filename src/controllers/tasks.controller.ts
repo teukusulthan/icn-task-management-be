@@ -108,7 +108,27 @@ export const getTaskById = async (req: Request, res: Response) => {
 export const updateTask = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = (req as any).user.id as string;
+
     const validatedData = updateTaskSchema.parse(req.body);
+
+    const existingTask = await prisma.task.findUnique({
+      where: { id },
+    });
+
+    if (!existingTask) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    if (existingTask.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
+      });
+    }
 
     const task = await prisma.task.update({
       where: { id },
@@ -139,6 +159,25 @@ export const updateTask = async (req: Request, res: Response) => {
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = (req as any).user.id as string;
+
+    const existingTask = await prisma.task.findUnique({
+      where: { id },
+    });
+
+    if (!existingTask) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    if (existingTask.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
+      });
+    }
 
     await prisma.task.delete({
       where: { id },
