@@ -1,6 +1,8 @@
 import cors from "cors";
 
+const origins = process.env.CLIENT_URL?.split(",") || [];
+
 export const corsMiddleware = cors({
-  origin: ["http://localhost:5173"],
+  origin: origins,
   credentials: true,
 });
