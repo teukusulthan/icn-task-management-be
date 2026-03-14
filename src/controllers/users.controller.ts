@@ -117,6 +117,17 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
 
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     const { email, password } = req.body;
 
     const data: any = {};
@@ -150,6 +161,17 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     await prisma.user.delete({
       where: { id },
@@ -232,6 +254,17 @@ export const loginUser = async (req: Request, res: Response) => {
 export const getUserTasks = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     const tasks = await prisma.task.findMany({
       where: { userId: id },
