@@ -282,3 +282,17 @@ export const getUserTasks = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const logoutUser = (req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+  });
+
+  return res.json({
+    success: true,
+    message: "Logout successful",
+    data: null,
+  });
+};

@@ -7,6 +7,7 @@ import {
   deleteUser,
   loginUser,
   getUserTasks,
+  logoutUser,
 } from "../controllers/users.controller";
 
 const router = Router();
@@ -18,5 +19,6 @@ router.put("/:id", updateUser);
 router.delete("/:id", deleteUser);
 router.post("/login", loginUser);
 router.get("/:id/tasks", getUserTasks);
+router.post("/logout", logoutUser);
 
 export default router;
