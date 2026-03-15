@@ -1,21 +1,21 @@
 # Task Management API
 
-REST API sederhana untuk mengelola aktivitas harian dalam bentuk tasks dengan dukungan manajemen user, autentikasi, dan relasi database one-to-many antara users dan tasks.
+A simple REST API to manage daily activities in the form of tasks with support for user management, authentication, and a one-to-many database relationship between users and tasks.
 
-Project ini dibuat sebagai bagian dari Junior Backend Developer Technical Test di ICN.
+This project was created as part of the Junior Backend Developer Technical Test at ICN.
 
-API memungkinkan user untuk:
+The API allows users to:
 
-- melakukan registrasi dan login
-- membuat dan mengelola tasks
-- melihat tasks milik user tertentu
-- melakukan operasi CRUD pada tasks
+- register and log in
+- create and manage tasks
+- view tasks belonging to a specific user
+- perform CRUD operations on tasks
 
 ---
 
 # Tech Stack
 
-Backend ini dibangun menggunakan teknologi berikut:
+This backend is built using the following technologies:
 
 - **Node.js**
 - **Express.js**
@@ -49,13 +49,13 @@ npm install
 
 ## 3. Setup Environment Variables
 
-Copy file `.env.example`
+Copy the `.env.example` file
 
 ```bash
 cp .env.example .env
 ```
 
-Contoh `.env`
+Example `.env`
 
 ```env
 DATABASE_URL=your_database_url
@@ -89,7 +89,7 @@ npm run build
 npm start
 ```
 
-Server akan berjalan di
+The server will run at
 
 ```
 http://localhost:3000
@@ -99,15 +99,15 @@ http://localhost:3000
 
 # Database Setup
 
-Project ini menggunakan PostgreSQL dengan Prisma ORM.
+This project uses PostgreSQL with Prisma ORM.
 
-Relasi database:
+Database relationship:
 
 ```
 User (1) ---- (N) Task
 ```
 
-Artinya satu user dapat memiliki banyak task.
+This means one user can have many tasks.
 
 ### User Table
 
@@ -133,24 +133,24 @@ Artinya satu user dapat memiliki banyak task.
 
 # Authentication
 
-Autentikasi menggunakan JWT yang disimpan dalam HTTP-only cookie.
+Authentication uses JWT stored in an HTTP-only cookie.
 
-Flow autentikasi:
+Authentication flow:
 
 ```
 User login
       │
       ▼
-Server membuat JWT
+Server generates JWT
       │
       ▼
-JWT disimpan di cookie
+JWT stored in cookie
       │
       ▼
-Protected routes memverifikasi token
+Protected routes verify token
 ```
 
-Endpoint yang membutuhkan autentikasi:
+Endpoints that require authentication:
 
 ```
 POST   /tasks
@@ -287,32 +287,32 @@ Response
 
 # Environment Variables
 
-Project ini menggunakan environment variables berikut:
+This project uses the following environment variables:
 
 | Variable     | Description                    |
 | ------------ | ------------------------------ |
 | DATABASE_URL | PostgreSQL database connection |
-| PORT         | Port server                    |
-| JWT_SECRET   | Secret key untuk JWT           |
+| PORT         | Server port                    |
+| JWT_SECRET   | Secret key for JWT             |
 | CLIENT_URL   | Allowed CORS origins           |
 
-File `.env.example` sudah disediakan di repository.
+The `.env.example` file is provided in the repository.
 
 ---
 
 # Postman Collection
 
-Untuk mempermudah testing API, Postman collection tersedia di folder:
+To make API testing easier, a Postman collection is available in the folder:
 
 ```
 postman/
 ```
 
-Import collection tersebut ke Postman untuk mencoba semua endpoint dengan cepat.
+Import the collection into Postman to quickly test all endpoints.
 
 # Notes
 
-- Repository ini bersifat public sesuai requirement submission.
-- File `.env` tidak di commit ke repository.
-- Folder `node_modules` juga tidak disertakan dalam repository.
-- Semua konfigurasi environment tersedia pada file `.env.example`.
+- This repository is public according to the submission requirement.
+- The `.env` file is not committed to the repository.
+- The `node_modules` folder is also not included in the repository.
+- All environment configuration is available in the `.env.example` file.
